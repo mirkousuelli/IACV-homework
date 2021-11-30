@@ -1,0 +1,17 @@
+% reading the image file
+%I = imread('../../img/villa_image.png');
+%I = rgb2gray(I);
+
+%figure(); imshow(I);
+%[feat1_x,feat1_y] = harris(I, 4, 20);
+%hold on; plot(feat1_y,feat1_x,'r+'); hold off;
+
+% reading the image file
+I = imread('../../img/villa_image.png');
+
+lines = findCorners(I, 4, 20)
+
+fig = plotLines(I, lines, 'red', 'corners')
+
+% show the edge image
+figure(1), imshow(fig)
