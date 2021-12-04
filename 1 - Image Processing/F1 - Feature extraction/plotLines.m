@@ -4,6 +4,8 @@ function fig = plotLines(input_im, lines, color, figure_title)
     % matlab function houghlines
     fig = figure();
     imshow(input_im), hold on
+    
+    % for each line detected
     for k = 1:length(lines)
         xy = [lines(k).point1; lines(k).point2];
         plot(xy(:,1),xy(:,2),'LineWidth',1,'Color', color);

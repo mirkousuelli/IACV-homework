@@ -4,9 +4,9 @@ function fig = plotCorners(input_im, loc_x, loc_y, color, figure_title)
     % matlab function houghlines
     fig = figure();
     imshow(input_im), hold on
-        %xy = [loc_x(k); loc_y(k)];
+    
+    % '+' marker for each corner detected at position (loc_y, loc_x)
     plot(loc_y,loc_x,append(color, '+'));
-        %text(lines(k).point1(1), lines(k).point1(2), int2str(k), 'FontSize',15, 'Color', 'white'); 
     title(figure_title);
     hold off
 end
