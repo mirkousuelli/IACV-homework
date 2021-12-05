@@ -1,5 +1,6 @@
 % reading the image file
 I = imread('../../img/villa_image.png');
+I = im2double(I);
 I = rgb2gray(I);
 
 % find corners

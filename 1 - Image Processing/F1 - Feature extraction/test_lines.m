@@ -1,5 +1,5 @@
 % reading the image file
-I = imread('../../img/affined_img.png');
+I = imread('../../img/villa_image.png');
 I = rgb2gray(I);
 
 % find lines 
