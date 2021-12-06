@@ -32,9 +32,9 @@ function K = calibration (perp_pairs)
     u = -IAC_n(1, 3)/IAC_n(1, 1);
     v = -IAC_n(2, 3);
     fy = sqrt(IAC_n(3, 3) - IAC_n(1, 1)*u^2 - v^2);
-    fx = fy/a;
+    fx = fy / a;
 
-    K = [fx,  0, u;
-         0,  fy, v;
-         0,   0, 1];
+    K = [fx, 0, u;
+         0, fy, v;
+         0,  0, 1];
 end
