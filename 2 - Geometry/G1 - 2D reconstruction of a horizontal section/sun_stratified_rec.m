@@ -61,6 +61,7 @@ B = [272 534 1]';
 E = [731 551 1]';
 G = [821 364 1]';
 P = [507 313 1]';
+
 Q = [507 328 1]';
 
 % LINES FROM CORNER POINTS
@@ -96,34 +97,38 @@ text(D(1), D(2), 'D', 'FontSize', 24, 'Color', 'b');
 plot(E(1), E(2),'.b','MarkerSize',12);
 text(E(1), E(2), 'E', 'FontSize', 24, 'Color', 'b');
 plot(F(1), F(2),'.b','MarkerSize',12);
-text(F(1), F(2), 'E', 'FontSize', 24, 'Color', 'b');
+text(F(1), F(2), 'F', 'FontSize', 24, 'Color', 'b');
 plot(G(1), G(2),'.b','MarkerSize',12);
-text(G(1), G(2), 'E', 'FontSize', 24, 'Color', 'b');
+text(G(1), G(2), 'G', 'FontSize', 24, 'Color', 'b');
 
 % PERPENDICULARS
-line_l = [[A(1) A(2)]; [C(1) C(2)]];
-plot(line_l(:,1),line_l(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_l(:,1),line_l(:,2), 'l', 'FontSize', 20, 'Color', 'yellow');
-line_l = cross(A, C);
-line_l = line_l / line_l(3);
+%l
+line_ac = [[A(1) A(2)]; [C(1) C(2)]];
+plot(line_ac(:,1),line_ac(:,2),'LineWidth',1,'Color', 'yellow');
+text(line_ac(:,1),line_ac(:,2), 'l', 'FontSize', 20, 'Color', 'yellow');
+line_ac = cross(A, C);
+line_ac = line_ac / line_ac(3);
 
-line_m = [[B(1) B(2)]; [F(1) F(2)]];
-plot(line_m(:,1),line_m(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_m(:,1),line_m(:,2), 'm', 'FontSize', 20, 'Color', 'yellow');
-line_m = cross(B, F);
-line_m = line_m / line_m(3);
+%m
+line_bf = [[B(1) B(2)]; [F(1) F(2)]];
+plot(line_bf(:,1),line_bf(:,2),'LineWidth',1,'Color', 'yellow');
+text(line_bf(:,1),line_bf(:,2), 'm', 'FontSize', 20, 'Color', 'yellow');
+line_bf = cross(B, F);
+line_bf = line_bf / line_bf(3);
 
-line_s = [[B(1) B(2)]; [E(1) E(2)]];
-plot(line_s(:,1),line_s(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_s(:,1),line_s(:,2), 's', 'FontSize', 20, 'Color', 'yellow');
-line_s = cross(B, E);
-line_s = line_s / line_s(3);
+%s
+line_be = [[B(1) B(2)]; [E(1) E(2)]];
+plot(line_be(:,1),line_be(:,2),'LineWidth',1,'Color', 'yellow');
+text(line_be(:,1),line_be(:,2), 's', 'FontSize', 20, 'Color', 'yellow');
+line_be = cross(B, E);
+line_be = line_be / line_be(3);
 
-line_t = [[G(1) G(2)]; [E(1) E(2)]];
-plot(line_t(:,1),line_t(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_t(:,1),line_t(:,2), 't', 'FontSize', 20, 'Color', 'yellow');
-line_t = cross(G, E);
-line_t = line_t / line_t(3);
+%t
+line_ge = [[G(1) G(2)]; [E(1) E(2)]];
+plot(line_ge(:,1),line_ge(:,2),'LineWidth',1,'Color', 'yellow');
+text(line_ge(:,1),line_ge(:,2), 't', 'FontSize', 20, 'Color', 'yellow');
+line_ge = cross(G, E);
+line_ge = line_ge / line_ge(3);
 hold off;
 pause;
 
@@ -195,48 +200,74 @@ plot(G(1), G(2),'.b','MarkerSize',12);
 text(G(1), G(2), 'G', 'FontSize', 24, 'Color', 'b');
 
 % LINES
-line_l = [[A(1) A(2)]; [C(1) C(2)]];
-plot(line_l(:,1),line_l(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_l(:,1),line_l(:,2), 'l', 'FontSize', 20, 'Color', 'yellow');
-line_l = cross(A, C);
-line_l = line_l / line_l(3);
+line_ac = [[A(1) A(2)]; [C(1) C(2)]];
+plot(line_ac(:,1),line_ac(:,2),'LineWidth',1,'Color', 'yellow');
+text(line_ac(:,1),line_ac(:,2), 'l', 'FontSize', 20, 'Color', 'yellow');
+line_ac = cross(A, C);
+line_ac = line_ac / line_ac(3);
 
-line_m = [[B(1) B(2)]; [F(1) F(2)]];
-plot(line_m(:,1),line_m(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_m(:,1),line_m(:,2), 'm', 'FontSize', 20, 'Color', 'yellow');
-line_m = cross(B, F);
-line_m = line_m / line_m(3);
+line_ab = [[A(1) A(2)]; [B(1) B(2)]];
+plot(line_ab(:,1),line_ab(:,2),'LineWidth',1,'Color', 'yellow');
+text(line_ab(:,1),line_ab(:,2), 'ab', 'FontSize', 20, 'Color', 'yellow');
+line_ab = cross(A, B);
+line_ab = line_ab / line_ab(3);
 
-line_s = [[B(1) B(2)]; [E(1) E(2)]];
-plot(line_s(:,1),line_s(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_s(:,1),line_s(:,2), 's', 'FontSize', 20, 'Color', 'yellow');
-line_s = cross(B, E);
-line_s = line_s / line_s(3);
+%m
+line_bf = [[B(1) B(2)]; [F(1) F(2)]];
+plot(line_bf(:,1),line_bf(:,2),'LineWidth',1,'Color', 'yellow');
+text(line_bf(:,1),line_bf(:,2), 'm', 'FontSize', 20, 'Color', 'yellow');
+line_bf = cross(B, F);
+line_bf = line_bf / line_bf(3);
 
-line_t = [[G(1) G(2)]; [E(1) E(2)]];
-plot(line_t(:,1),line_t(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_t(:,1),line_t(:,2), 't', 'FontSize', 20, 'Color', 'yellow');
-line_t = cross(G, E);
-line_t = line_t / line_t(3);
+%s
+line_be = [[B(1) B(2)]; [E(1) E(2)]];
+plot(line_be(:,1),line_be(:,2),'LineWidth',1,'Color', 'yellow');
+text(line_be(:,1),line_be(:,2), 's', 'FontSize', 20, 'Color', 'yellow');
+line_be = cross(B, E);
+line_be = line_be / line_be(3);
+
+%t
+line_ge = [[G(1) G(2)]; [E(1) E(2)]];
+plot(line_ge(:,1),line_ge(:,2),'LineWidth',1,'Color', 'yellow');
+text(line_ge(:,1),line_ge(:,2), 't', 'FontSize', 20, 'Color', 'yellow');
+line_ge = cross(G, E);
+line_ge = line_ge / line_ge(3);
 hold off;
 pause;
 
 %% RECTIFICATION
-constr = zeros(2,3);
-constr(1,:) = [line_l(1)*line_m(1),line_l(1)*line_m(2)+line_l(2)*line_m(1), line_l(2)*line_m(2)];
-constr(2,:) = [line_t(1)*line_s(1),line_t(1)*line_s(2)+line_t(2)*line_s(1), line_t(2)*line_s(2)];
+%constr = zeros(2,3);
+%constr(1,:) = [line_ac(1)*line_bf(1),line_ac(1)*line_bf(2)+line_ac(2)*line_bf(1), line_ac(2)*line_bf(2)];
+%constr(2,:) = [line_ge(1)*line_be(1),line_ge(1)*line_be(2)+line_ge(2)*line_be(1), line_ge(2)*line_be(2)];
+
+syms a b c d;
+W = [a 0 b; 0 1 c; b c d];
+
+eq1 = (line_ab.' * W * line_ac) / (sqrt(line_ab.' * W * line_ab) * sqrt(line_ac.' * W * line_ac)) - cos(atan(1/3.9));
+eq2 = line_ab.' * W * line_be;
+
+eqns = [eq1 == 0, eq2 == 0];
+sol = solve(eqns, [a, b, c, d]);
+
+imDCCP = [double(sol.a) 0 double(sol.b); 0 1 double(sol.c); double(sol.b) double(sol.c) double(sol.d)];
+
+%% solutions
+
+%II = [double(sol.x(1));double(sol.y(1));1];
+%JJ = [double(sol.x(2));double(sol.y(2));1];
 
 % solve the system
 
 %S = [x(1) x(2); x(2) 1];
-[~,~,v] = svd(constr);
-s = v(:,end); %[s11,s12,s22];
-S = [s(1),s(2); s(2),s(3)];
+%[~,~,v] = svd(constr);
+%s = v(:,end); %[s11,s12,s22];
+%S = [s(1),s(2); s(2),s(3)];
 
 % compute the rectifying homography
 
 % image of circular points
-imDCCP = [S,zeros(2,1); zeros(1,3)]; % the image of the circular points
+%imDCCP = [S,zeros(2,1); zeros(1,3)]; % the image of the circular points
+S = [imDCCP(1,1),imDCCP(1,2); imDCCP(2,1),imDCCP(2,2)];
 [U,DD,V] = svd(S);
 constr = U*sqrt(DD)*V';
 H = eye(3);

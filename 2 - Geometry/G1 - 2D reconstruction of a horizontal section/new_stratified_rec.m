@@ -13,21 +13,6 @@ img_gray = rgb2gray(img);
 %% interactively select f families of segments that are images of 3D parallel lines
 lines = findLines(img_gray);
 
-% CONSTRUCTION LINES
-idx = [26, 32];
-label = ['n', 'r']
-fig = figure();
-imshow(img), hold on;
-for k = 1:length(idx)
-    xy = [lines(idx(k)).point1; lines(idx(k)).point2];
-    plot(xy(:,1),xy(:,2),'LineWidth',1,'Color', 'red');
-    text(xy(:,1),xy(:,2), label(k), 'FontSize', 20, 'Color', 'red'); 
-end
-line_n = cross([lines(idx(1)).point1 1]', [lines(idx(1)).point2 1]');
-line_n = line_n / line_n(3);
-line_r = cross([lines(idx(2)).point1 1]', [lines(idx(2)).point2 1]');
-line_r = line_r / line_r(3);
-
 % PARALLEL LINES
 idx = [8, 12, 16, 18];
 label = ['a', 'b', 'c', 'd']
@@ -49,41 +34,60 @@ parallelLines{1}(2,:) = line_d;
 parallelLines{2}(1,:) = line_b;
 parallelLines{2}(2,:) = line_c;
 
+figure; imshow(img); hold on;
 for k = 1:length(idx)
     xy = [lines(idx(k)).point1; lines(idx(k)).point2];
-    plot(xy(:,1),xy(:,2),'LineWidth',1,'Color', 'green');
+    plot(xy(:,1),xy(:,2),'LineWidth',2,'Color', 'green');
     text(xy(:,1),xy(:,2), label(k), 'FontSize', 20, 'Color', 'green');
 end
 
 % POINTS (CORNER DETECTION)
-A = [226 334 1]';
-B = [272 534 1]';
-E = [731 551 1]';
-G = [821 364 1]';
+A = [226; 334; 1];
+B = [272; 534; 1];
+C = [731; 551; 1];
+D = [821; 364; 1];
+X = [A, B, C, D];
+
+a = [224; 1062; 1];
+b = [203; 1310; 1];
+c = [804; 1293; 1];
+d = [783; 1055; 1];
+x = [a, b, c, d];
+
 P = [507 313 1]';
 Q = [507 328 1]';
 
+H = homographyEstimation(x, X);
+
+pp1_1 = [471 1119 1]';
+pp1_2 = [498 1148 1]';
+pp2_1 = [547 1118 1]';
+pp2_2 = [518 1148 1]';
+
+PP1_1 = H * pp1_1;
+PP1_1 = PP1_1 / PP1_1(3);
+PP1_2 = H * pp1_2;
+PP1_2 = PP1_2 / PP1_2(3);
+PP2_1 = H * pp2_1;
+PP2_1 = PP2_1 / PP2_1(3);
+PP2_2 = H * pp2_2;
+PP2_2 = PP2_2 / PP2_2(3);
+
 % LINES FROM CORNER POINTS
-line_s = cross(B, E);
+line_pp1 = cross(PP1_1, PP1_2);
+line_pp1 = line_pp1 / line_pp1(3);
+line_pp2 = cross(PP2_1, PP2_2);
+line_pp2 = line_pp2 / line_pp2(3);
+line_s = cross(B, C);
 line_s = line_s / line_s(3);
-line_t = cross(G, E);
+line_t = cross(C, D);
 line_t = line_t / line_t(3);
 line_u = cross(P, Q);
 line_u = line_u / line_u(3);
 
 % POINTS FROM INTERSECTED LINES
-C = cross(line_r, line_s);
-C = C / C(3);
-D = cross(line_u, line_s);
-D = D / D(3);
-F = cross(line_t, line_n);
-F = F / F(3);
-
-% PERPENDICULAR LINES FOR METRIC RECTIFICATION
-line_l = cross(A, C);
-line_l = line_l / line_l(3);
-line_m = cross(B, F);
-line_m = line_m / line_m(3);
+E = cross(line_u, line_s);
+E = E / E(3);
 
 plot(A(1), A(2),'.b','MarkerSize',12);
 text(A(1), A(2), 'A', 'FontSize', 24, 'Color', 'b');
@@ -95,34 +99,26 @@ plot(D(1), D(2),'.b','MarkerSize',12);
 text(D(1), D(2), 'D', 'FontSize', 24, 'Color', 'b');
 plot(E(1), E(2),'.b','MarkerSize',12);
 text(E(1), E(2), 'E', 'FontSize', 24, 'Color', 'b');
-plot(F(1), F(2),'.b','MarkerSize',12);
-text(F(1), F(2), 'E', 'FontSize', 24, 'Color', 'b');
-plot(G(1), G(2),'.b','MarkerSize',12);
-text(G(1), G(2), 'E', 'FontSize', 24, 'Color', 'b');
 
 % PERPENDICULARS
-line_l = [[A(1) A(2)]; [C(1) C(2)]];
-plot(line_l(:,1),line_l(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_l(:,1),line_l(:,2), 'l', 'FontSize', 20, 'Color', 'yellow');
-line_l = cross(A, C);
-line_l = line_l / line_l(3);
+PP1 = [[PP1_1(1) PP1_1(2)]; [PP1_2(1) PP1_2(2)]];
+plot(PP1(:,1),PP1(:,2),'LineWidth',2,'Color', 'm');
+text(PP1(:,1),PP1(:,2), 'l', 'FontSize', 20, 'Color', 'm');
 
-line_m = [[B(1) B(2)]; [F(1) F(2)]];
-plot(line_m(:,1),line_m(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_m(:,1),line_m(:,2), 'm', 'FontSize', 20, 'Color', 'yellow');
-line_m = cross(B, F);
-line_m = line_m / line_m(3);
+PP2 = [[PP2_1(1) PP2_1(2)]; [PP2_2(1) PP2_2(2)]];
+plot(PP2(:,1),PP2(:,2),'LineWidth',2,'Color', 'm');
+text(PP2(:,1),PP2(:,2), 'm', 'FontSize', 20, 'Color', 'm');
 
-line_s = [[B(1) B(2)]; [E(1) E(2)]];
-plot(line_s(:,1),line_s(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_s(:,1),line_s(:,2), 's', 'FontSize', 20, 'Color', 'yellow');
-line_s = cross(B, E);
+line_s = [[B(1) B(2)]; [C(1) C(2)]];
+plot(line_s(:,1),line_s(:,2),'LineWidth',2,'Color', 'm');
+text(line_s(:,1),line_s(:,2), 's', 'FontSize', 20, 'Color', 'm');
+line_s = cross(B, C);
 line_s = line_s / line_s(3);
 
-line_t = [[G(1) G(2)]; [E(1) E(2)]];
-plot(line_t(:,1),line_t(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_t(:,1),line_t(:,2), 't', 'FontSize', 20, 'Color', 'yellow');
-line_t = cross(G, E);
+line_t = [[C(1) C(2)]; [D(1) D(2)]];
+plot(line_t(:,1),line_t(:,2),'LineWidth',2,'Color', 'm');
+text(line_t(:,1),line_t(:,2), 't', 'FontSize', 20, 'Color', 'm');
+line_t = cross(C, D);
 line_t = line_t / line_t(3);
 hold off;
 pause;
@@ -174,8 +170,10 @@ J = imcrop(J,[4351 8805 3237 2141]);
 [C(1),C(2)] = transformPointsForward(tform,C(1),C(2));
 [D(1),D(2)] = transformPointsForward(tform,D(1),D(2));
 [E(1),E(2)] = transformPointsForward(tform,E(1),E(2));
-[F(1),F(2)] = transformPointsForward(tform,F(1),F(2));
-[G(1),G(2)] = transformPointsForward(tform,G(1),G(2));
+[PP1_1(1),PP1_1(2)] = transformPointsForward(tform,PP1_1(1),PP1_1(2));
+[PP1_2(1),PP1_2(2)] = transformPointsForward(tform,PP1_2(1),PP1_2(2));
+[PP2_1(1),PP2_1(2)] = transformPointsForward(tform,PP2_1(1),PP2_1(2));
+[PP2_2(1),PP2_2(2)] = transformPointsForward(tform,PP2_2(1),PP2_2(2));
 
 figure; imshow(J), hold on;
 % POINTS
@@ -189,34 +187,30 @@ plot(D(1), D(2),'.b','MarkerSize',12);
 text(D(1), D(2), 'D', 'FontSize', 24, 'Color', 'b');
 plot(E(1), E(2),'.b','MarkerSize',12);
 text(E(1), E(2), 'E', 'FontSize', 24, 'Color', 'b');
-plot(F(1), F(2),'.b','MarkerSize',12);
-text(F(1), F(2), 'F', 'FontSize', 24, 'Color', 'b');
-plot(G(1), G(2),'.b','MarkerSize',12);
-text(G(1), G(2), 'G', 'FontSize', 24, 'Color', 'b');
 
 % LINES
-line_l = [[A(1) A(2)]; [C(1) C(2)]];
-plot(line_l(:,1),line_l(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_l(:,1),line_l(:,2), 'l', 'FontSize', 20, 'Color', 'yellow');
-line_l = cross(A, C);
+PP1 = [[PP1_1(1) PP1_1(2)]; [PP1_2(1) PP1_2(2)]];
+plot(PP1(:,1),PP1(:,2),'LineWidth',2,'Color', 'm');
+text(PP1(:,1),PP1(:,2), 'l', 'FontSize', 20, 'Color', 'm');
+line_l = cross(PP1_1, PP1_2);
 line_l = line_l / line_l(3);
 
-line_m = [[B(1) B(2)]; [F(1) F(2)]];
-plot(line_m(:,1),line_m(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_m(:,1),line_m(:,2), 'm', 'FontSize', 20, 'Color', 'yellow');
-line_m = cross(B, F);
+PP2 = [[PP2_1(1) PP2_1(2)]; [PP2_2(1) PP2_2(2)]];
+plot(PP2(:,1),PP2(:,2),'LineWidth',2,'Color', 'm');
+text(PP2(:,1),PP2(:,2), 'm', 'FontSize', 20, 'Color', 'm');
+line_m = cross(PP2_1, PP2_2);
 line_m = line_m / line_m(3);
 
-line_s = [[B(1) B(2)]; [E(1) E(2)]];
-plot(line_s(:,1),line_s(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_s(:,1),line_s(:,2), 's', 'FontSize', 20, 'Color', 'yellow');
-line_s = cross(B, E);
+line_s = [[B(1) B(2)]; [C(1) C(2)]];
+plot(line_s(:,1),line_s(:,2),'LineWidth',2,'Color', 'm');
+text(line_s(:,1),line_s(:,2), 's', 'FontSize', 20, 'Color', 'm');
+line_s = cross(B, C);
 line_s = line_s / line_s(3);
 
-line_t = [[G(1) G(2)]; [E(1) E(2)]];
-plot(line_t(:,1),line_t(:,2),'LineWidth',1,'Color', 'yellow');
-text(line_t(:,1),line_t(:,2), 't', 'FontSize', 20, 'Color', 'yellow');
-line_t = cross(G, E);
+line_t = [[C(1) C(2)]; [D(1) D(2)]];
+plot(line_t(:,1),line_t(:,2),'LineWidth',2,'Color', 'm');
+text(line_t(:,1),line_t(:,2), 't', 'FontSize', 20, 'Color', 'm');
+line_t = cross(C, D);
 line_t = line_t / line_t(3);
 hold off;
 pause;
@@ -261,24 +255,18 @@ J = imcrop(J,[0 648 3969 3789]);
 [C(1),C(2)] = transformPointsForward(tform,C(1),C(2));
 [D(1),D(2)] = transformPointsForward(tform,D(1),D(2));
 [E(1),E(2)] = transformPointsForward(tform,E(1),E(2));
-[F(1),F(2)] = transformPointsForward(tform,F(1),F(2));
-[G(1),G(2)] = transformPointsForward(tform,G(1),G(2));
 
-A(1) = A(1) + 673;
-B(1) = B(1) + 673;
-C(1) = C(1) + 673;
-D(1) = D(1) + 673;
-E(1) = E(1) + 673;
-F(1) = F(1) + 673;
-G(1) = G(1) + 673;
+A(1) = A(1) + 873;
+B(1) = B(1) + 873;
+C(1) = C(1) + 873;
+D(1) = D(1) + 873;
+E(1) = E(1) + 873;
 
-A(2) = A(2) + 376;
-B(2) = B(2) + 376;
-C(2) = C(2) + 376;
-D(2) = D(2) + 376;
-E(2) = E(2) + 376;
-F(2) = F(2) + 376;
-G(2) = G(2) + 376;
+A(2) = A(2) + 656;
+B(2) = B(2) + 656;
+C(2) = C(2) + 656;
+D(2) = D(2) + 656;
+E(2) = E(2) + 656;
 
 figure; imshow(J), hold on;
 
@@ -294,10 +282,6 @@ if 2 == 2
     text(D(1), D(2), 'D', 'FontSize', 24, 'Color', 'b');
     plot(E(1), E(2),'.b','MarkerSize',12);
     text(E(1), E(2), 'E', 'FontSize', 24, 'Color', 'b');
-    plot(F(1), F(2),'.b','MarkerSize',12);
-    text(F(1), F(2), 'F', 'FontSize', 24, 'Color', 'b');
-    plot(G(1), G(2),'.b','MarkerSize',12);
-    text(G(1), G(2), 'G', 'FontSize', 24, 'Color', 'b');
 end
 
 % LINES
@@ -305,11 +289,11 @@ facade_2 = [[A(1) A(2)]; [B(1) B(2)]];
 plot(facade_2(:,1),facade_2(:,2),'LineWidth',3,'Color', 'red');
 text(facade_2(:,1),facade_2(:,2), '2', 'FontSize', 20, 'Color', 'red');
 
-facade_3 = [[B(1) B(2)]; [E(1) E(2)]];
+facade_3 = [[B(1) B(2)]; [C(1) C(2)]];
 plot(facade_3(:,1),facade_3(:,2),'LineWidth',3,'Color', 'red');
 text(facade_3(:,1),facade_3(:,2), '3', 'FontSize', 20, 'Color', 'red');
 
-facade_4 = [[E(1) E(2)]; [G(1) G(2)]];
+facade_4 = [[C(1) C(2)]; [D(1) D(2)]];
 plot(facade_4(:,1),facade_4(:,2),'LineWidth',3,'Color', 'red');
 text(facade_4(:,1),facade_4(:,2), '4', 'FontSize', 20, 'Color', 'red');
 hold off;
@@ -318,12 +302,12 @@ hold off;
 norm_factor = max((size(img)));
 norm_matrix = diag([1/norm_factor, 1/norm_factor, 1]);
 
+C_n = (C' * norm_matrix)';
 D_n = (D' * norm_matrix)';
 E_n = (E' * norm_matrix)';
-G_n = (G' * norm_matrix)';
 
-half_f3 = sqrt((D_n(1)-E_n(1))^2 + (D_n(2)-E_n(2))^2);
-f4 = sqrt((G_n(1)-E_n(1))^2 + (G_n(2)-E_n(2))^2);
+half_f3 = sqrt((E_n(1)-C_n(1))^2 + (E_n(2)-C_n(2))^2);
+f4 = sqrt((C_n(1)-D_n(1))^2 + (C_n(2)-D_n(2))^2);
 
 ratio = f4 / (half_f3 * 2);
 

@@ -14,55 +14,87 @@ img_gray = rgb2gray(img);
 % interactively select f families of segments that are images of 3D parallel lines
 lines = findLines(img_gray);
 
-% CONSTRUCTION LINES
-idx = [23, 17, 20, 29, 7, 2];
-label = ['m', 'n', 'p', 'q', 'r', 's'];
+% CONSTRUCTION LINE
+idx = [3,  19]; % vertical
+label = ['m', 'n'];
 fig = figure();
 imshow(img), hold on;
 for k = 1:length(idx)
     xy = [lines(idx(k)).point1; lines(idx(k)).point2];
-    plot(xy(:,1),xy(:,2),'LineWidth',1,'Color', 'red');
+    plot(xy(:,1),xy(:,2),'LineWidth',2,'Color', 'red');
     text(xy(:,1),xy(:,2), label(k), 'FontSize', 20, 'Color', 'red'); 
 end
-hold off;
 
 line_m = cross([lines(idx(1)).point1 1]', [lines(idx(1)).point2 1]');
 line_m = line_m / line_m(3);
 line_n = cross([lines(idx(2)).point1 1]', [lines(idx(2)).point2 1]');
 line_n = line_n / line_n(3);
-V0 = cross(line_m, line_n);
-V0 = V0 / V0(3);
+vvz = cross(line_m, line_n);
+vvz = vvz / vvz(3);
 
-line_p = cross([lines(idx(3)).point1 1]', [lines(idx(3)).point2 1]');
-line_p = line_p / line_p(3);
-line_q = cross([lines(idx(4)).point1 1]', [lines(idx(4)).point2 1]');
-line_q = line_q / line_q(3);
-V1 = cross(line_p, line_q);
-V1 = V1 / V1(3);
+% POINTS (CORNER DETECTION)
+A = [226 334 1]';
+B = [272 534 1]';
+E = [731 551 1]';
+G = [821 364 1]';
 
-line_r = cross([lines(idx(5)).point1 1]', [lines(idx(5)).point2 1]');
-line_r = line_r / line_r(3);
-line_s = cross([lines(idx(6)).point1 1]', [lines(idx(6)).point2 1]');
-line_s = line_s / line_s(3);
-V2 = cross(line_r, line_s);
-V2 = V2 / V2(3);
+plot(A(1), A(2),'.b','MarkerSize',12);
+text(A(1), A(2), 'A', 'FontSize', 24, 'Color', 'b');
+plot(B(1), B(2),'.b','MarkerSize',12);
+text(B(1), B(2), 'B', 'FontSize', 24, 'Color', 'b');
+plot(E(1), E(2),'.b','MarkerSize',12);
+text(E(1), E(2), 'E', 'FontSize', 24, 'Color', 'b');
+plot(G(1), G(2),'.b','MarkerSize',12);
+text(G(1), G(2), 'G', 'FontSize', 24, 'Color', 'b');
 
-V_line = cross(V1, V2);
-V_line = V_line / V_line(3);
+line_ab = cross(A,B);
+line_ab = line_ab / line_ab(3);
+ab = [[A(1) A(2)]; [B(1) B(2)]];
+plot(ab(:,1), ab(:,2), 'LineWidth', 2, 'Color', 'blue');
+
+line_be = cross(B,E);
+line_be = line_be / line_be(3);
+be = [[B(1) B(2)]; [E(1) E(2)]];
+plot(be(:,1), be(:,2), 'LineWidth', 2, 'Color', 'blue');
+
+line_eg = cross(E,G);
+line_eg = line_eg / line_eg(3);
+eg = [[E(1) E(2)]; [G(1) G(2)]];
+plot(eg(:,1), eg(:,2), 'LineWidth', 2, 'Color', 'blue');
+
+line_ga = cross(G,A);
+line_ga = line_ga / line_ga(3);
+ga = [[G(1) G(2)]; [A(1) A(2)]];
+plot(ga(:,1), ga(:,2), 'LineWidth', 2, 'Color', 'blue');
+
+hold off;
+
+vvx = cross(line_ga, line_be);
+vvx = vvx / vvx(3);
+
+vvy = cross(line_ab, line_eg);
+vvy = vvy / vvy(3);
+
+inf_line = cross(vvx, vvy);
+inf_line = inf_line / inf_line(3);
 
 H_aff = [1.0000, 0,      -0.0001;
          0,      1.0000, -0.0008;
          0,      0,       1.0000;];
      
-H_met = [1.2256,-0.3136, 0;
-        -0.3136, 1.4664, 0;
-         0,      0,      1.0000;];
+%H_met = [1.5873, -0.4036, 0;
+%        -0.4036,  1.2664, 0;
+%         0,       0,      1.0000;];
+
+H_met = [1.1376,   -0.3067,         0;
+        -0.3067,    1.7169,         0;
+         0,         0,              1.0000;];
      
 H = H_met * H_aff;
 H = inv(H);
 
 % Using L_inf, vertical vp and homography
-IAC = get_IAC(V_line, V0, V1, V2, H);
+IAC = get_IAC(inf_line, vvz, vvx, vvy, H);
 
 % get the intrinsic parameter before the denormalization
 alfa = sqrt(IAC(1,1));
