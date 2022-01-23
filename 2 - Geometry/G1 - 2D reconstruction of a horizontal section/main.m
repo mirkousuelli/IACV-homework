@@ -3,30 +3,18 @@
 % ---------- G1 - 2D RECONSTRUCTION OF A HORIZONTAL SECTION ---------------
 % #########################################################################
 
+%% AFFINE CONSTRAINTS
+
 %load the image
 clc;
 clear;
 close all;
 img = imread('../../img/villa_image.png');
 img_gray = rgb2gray(img);
+debug = false;
 
 % getting lines from line detector
 lines = findLines(img_gray);
-
-% line used to mark the vertical shadow on the horizontal section
-% we are interested to rectify
-idx = [32];
-label = ['r'];
-fig = figure();
-imshow(img), hold on;
-for k = 1:length(idx)
-    xy = [lines(idx(k)).point1; lines(idx(k)).point2];
-    %plot(xy(:,1),xy(:,2),'LineWidth',1,'Color', 'red');
-    %text(xy(:,1),xy(:,2), label(k), 'FontSize', 20, 'Color', 'red'); 
-end
-% shadow vertical line
-line_r = cross([lines(idx(1)).point1 1]', [lines(idx(1)).point2 1]');
-line_r = line_r / line_r(3);
 
 % parallel lines to be exploit for affinity constraints
 idx = [8, 12, 16, 18];
@@ -35,6 +23,7 @@ f = 2; % number of families of parallel lines
 numSegmentsPerFamily = 2;
 parallelLines = cell(f,1); % store parallel lines
 
+% obtaining parallel lines for affinity constraints
 line_a = cross([lines(idx(1)).point1 1]', [lines(idx(1)).point2 1]');
 line_a = line_a / line_a(3);
 line_b = cross([lines(idx(2)).point1 1]', [lines(idx(2)).point2 1]');
@@ -49,15 +38,21 @@ parallelLines{1}(2,:) = line_d;
 parallelLines{2}(1,:) = line_b;
 parallelLines{2}(2,:) = line_c;
 
+fig = figure();
+imshow(img), hold on;
+
 % plotting lines
 for k = 1:length(idx)
     xy = [lines(idx(k)).point1; lines(idx(k)).point2];
     plot(xy(:,1),xy(:,2),'LineWidth',4,'Color', 'red');
-    %text(xy(:,1),xy(:,2), label(k), 'FontSize', 20, 'Color', 'green');
+    if debug
+        text(xy(:,1),xy(:,2), label(k), 'FontSize', 20, 'Color', 'green');
+    end
 end
 hold off;
 pause;
 
+%% EUCLIDEAN CONSTRAINTS
 fig = figure();
 imshow(img), hold on;
 
@@ -69,6 +64,14 @@ G = [821 364 1]';
 P = [507 313 1]';
 Q = [507 328 1]';
 
+% top and bottom corners for the vertical shadow
+S_TOP = [342 1065 1]';
+S_BOT = [343 1300 1]';
+
+% computing the shadow vertical line through corners previously detected
+shadow_line = cross(S_TOP, S_BOT);
+shadow_line = shadow_line / shadow_line(3);
+
 % computing linking lines bewteen points
 line_s = cross(B, E);
 line_s = line_s / line_s(3);
@@ -78,86 +81,42 @@ line_u = cross(P, Q);
 line_u = line_u / line_u(3);
 
 % points from interesected lines
-C = cross(line_r, line_s);
+C = cross(shadow_line, line_s);
 C = C / C(3);
 D = cross(line_u, line_s);
 D = D / D(3);
 
 % points plotting
-%plot(A(1), A(2),'.b','MarkerSize',12);
-%text(A(1), A(2), 'A', 'FontSize', 24, 'Color', 'b');
-%plot(B(1), B(2),'.b','MarkerSize',12);
-%text(B(1), B(2), 'B', 'FontSize', 24, 'Color', 'b');
-%plot(C(1), C(2),'.b','MarkerSize',12);
-%text(C(1), C(2), 'C', 'FontSize', 24, 'Color', 'b');
-%plot(D(1), D(2),'.b','MarkerSize',12);
-%text(D(1), D(2), 'D', 'FontSize', 24, 'Color', 'b');
-%plot(E(1), E(2),'.b','MarkerSize',12);
-%text(E(1), E(2), 'E', 'FontSize', 24, 'Color', 'b');
-%plot(G(1), G(2),'.b','MarkerSize',12);
-%text(G(1), G(2), 'G', 'FontSize', 24, 'Color', 'b');
-
-% first pair of perpendicular constraints
-line_be = [[B(1) B(2)]; [E(1) E(2)]];
-plot(line_be(:,1),line_be(:,2),'LineWidth',4,'Color', 'r');
-%text(line_be(:,1),line_be(:,2), 's', 'FontSize', 20, 'Color', 'yellow');
-line_be = cross(B, E);
-line_be = line_be / line_be(3);
-
-line_ge = [[G(1) G(2)]; [E(1) E(2)]];
-plot(line_ge(:,1),line_ge(:,2),'LineWidth',4,'Color', 'r');
-%text(line_ge(:,1),line_ge(:,2), 't', 'FontSize', 20, 'Color', 'yellow');
-line_ge = cross(G, E);
-line_ge = line_ge / line_ge(3);
+if debug
+    plot(A(1), A(2),'.b','MarkerSize',12);
+    text(A(1), A(2), 'A', 'FontSize', 24, 'Color', 'b');
+    plot(B(1), B(2),'.b','MarkerSize',12);
+    text(B(1), B(2), 'B', 'FontSize', 24, 'Color', 'b');
+    plot(C(1), C(2),'.b','MarkerSize',12);
+    text(C(1), C(2), 'C', 'FontSize', 24, 'Color', 'b');
+    plot(D(1), D(2),'.b','MarkerSize',12);
+    text(D(1), D(2), 'D', 'FontSize', 24, 'Color', 'b');
+    plot(E(1), E(2),'.b','MarkerSize',12);
+    text(E(1), E(2), 'E', 'FontSize', 24, 'Color', 'b');
+    plot(G(1), G(2),'.b','MarkerSize',12);
+    text(G(1), G(2), 'G', 'FontSize', 24, 'Color', 'b');
+end
 
 
-% computing the sun constraint of similar triangle
-dist_short_shadow = sqrt((B(1) - C(1))^2 + (B(2) - C(2))^2);
-SUN_RATIO = 3.9;
+line_ab = [[A(1) A(2)]; [B(1) B(2)]];
+plot(line_ab(:,1),line_ab(:,2),'LineWidth',4,'Color', 'r');
+line_ab = cross(A, B);
+line_ab = line_ab / line_ab(3);
 
-% extending the shorter side in proportion to the longer one in order to
-% obtain a perfect square
-dist_extended_shadow = SUN_RATIO * dist_short_shadow;
+line_bc = [[B(1) B(2)]; [C(1) C(2)]];
+plot(line_bc(:,1),line_bc(:,2),'LineWidth',4,'Color', 'r');
+line_bc = cross(B, C);
+line_bc = line_bc / line_bc(3);
 
-v = [C(1)-B(1) C(2)-B(2)]';
-u = v ./ norm(v);
-N = B(1:2) + dist_extended_shadow * u;
-N = [N(1) N(2) 1]';
-
-%plot(N(1), N(2),'.b','MarkerSize',12);
-%text(N(1), N(2), 'N', 'FontSize', 24, 'Color', 'b');
-
-M = cross(line_b, line_c);
-M = M / M(3);
-%plot(M(1), M(2),'.b','MarkerSize',12);
-%text(M(1), M(2), 'M', 'FontSize', 24, 'Color', 'b');
-
-% line used to obtain the missing side of square by exploiting the
-% vanishing point of perspective in the middle of the image
-line_nm = [[N(1) N(2)]; [M(1) M(2)]];
-%plot(line_nm(:,1),line_nm(:,2),'LineWidth',1,'Color', 'red');
-%text(line_nm(:,1),line_nm(:,2), 'l', 'FontSize', 20, 'Color', 'red');
-line_nm = cross(N, M);
-line_nm = line_nm / line_nm(3);
-
-L = cross(line_a, line_nm);
-L = L / L(3);
-%plot(L(1), L(2),'.b','MarkerSize',12);
-%text(L(1), L(2), 'L', 'FontSize', 24, 'Color', 'b');
-
-line_an = [[A(1) A(2)]; [N(1) N(2)]];
-plot(line_an(:,1),line_an(:,2),'LineWidth',4,'Color', 'r');
-%text(line_an(:,1),line_an(:,2), 't', 'FontSize', 20, 'Color', 'r');
-line_an = cross(A, N);
-line_an = line_an / line_an(3);
-
-line_bl = [[B(1) B(2)]; [L(1) L(2)]];
-plot(line_bl(:,1),line_bl(:,2),'LineWidth',4,'Color', 'r');
-%text(line_bl(:,1),line_bl(:,2), 't', 'FontSize', 20, 'Color', 'r');
-line_bl = cross(B, L);
-line_bl = line_bl / line_bl(3);
 hold off;
 pause;
+
+%% AFFINE TRANSFORMATION
 
 % compute the vanishing points
 V = nan(2,f);
@@ -192,67 +151,55 @@ J = imcrop(J,[4351 8805 3237 2141]);
 [D(1),D(2)] = transformPointsForward(tform,D(1),D(2));
 [E(1),E(2)] = transformPointsForward(tform,E(1),E(2));
 [G(1),G(2)] = transformPointsForward(tform,G(1),G(2));
-[L(1),L(2)] = transformPointsForward(tform,L(1),L(2));
-[N(1),N(2)] = transformPointsForward(tform,N(1),N(2));
 
 figure; imshow(J), hold on;
 
 % points
-%plot(A(1), A(2),'.b','MarkerSize',12);
-%text(A(1), A(2), 'A', 'FontSize', 24, 'Color', 'b');
-%plot(B(1), B(2),'.b','MarkerSize',12);
-%text(B(1), B(2), 'B', 'FontSize', 24, 'Color', 'b');
-%plot(C(1), C(2),'.b','MarkerSize',12);
-%text(C(1), C(2), 'C', 'FontSize', 24, 'Color', 'b');
-%plot(D(1), D(2),'.b','MarkerSize',12);
-%text(D(1), D(2), 'D', 'FontSize', 24, 'Color', 'b');
-%plot(E(1), E(2),'.b','MarkerSize',12);
-%text(E(1), E(2), 'E', 'FontSize', 24, 'Color', 'b');
-%plot(G(1), G(2),'.b','MarkerSize',12);
-%text(G(1), G(2), 'G', 'FontSize', 24, 'Color', 'b');
-%plot(L(1), L(2),'.b','MarkerSize',12);
-%text(L(1), L(2), 'L', 'FontSize', 24, 'Color', 'b');
-%plot(N(1), N(2),'.b','MarkerSize',12);
-%text(N(1), N(2), 'N', 'FontSize', 24, 'Color', 'b');
+if debug
+    plot(A(1), A(2),'.b','MarkerSize',12);
+    text(A(1), A(2), 'A', 'FontSize', 24, 'Color', 'b');
+    plot(B(1), B(2),'.b','MarkerSize',12);
+    text(B(1), B(2), 'B', 'FontSize', 24, 'Color', 'b');
+    plot(C(1), C(2),'.b','MarkerSize',12);
+    text(C(1), C(2), 'C', 'FontSize', 24, 'Color', 'b');
+    plot(D(1), D(2),'.b','MarkerSize',12);
+    text(D(1), D(2), 'D', 'FontSize', 24, 'Color', 'b');
+    plot(E(1), E(2),'.b','MarkerSize',12);
+    text(E(1), E(2), 'E', 'FontSize', 24, 'Color', 'b');
+    plot(G(1), G(2),'.b','MarkerSize',12);
+    text(G(1), G(2), 'G', 'FontSize', 24, 'Color', 'b');
+end
 
 % lines
-%line_ab = [[A(1) A(2)]; [B(1) B(2)]];
-%plot(line_ab(:,1),line_ab(:,2),'LineWidth',1,'Color', 'yellow');
-%text(line_ab(:,1),line_ab(:,2), 'ab', 'FontSize', 20, 'Color', 'yellow');
-%line_ab = cross(A, B);
-%line_ab = line_ab / line_ab(3);
+seg_ab = [[A(1) A(2)]; [B(1) B(2)]];
+plot(seg_ab(:,1),seg_ab(:,2),'LineWidth',4,'Color', 'r');
+line_ab = cross(A, B);
+line_ab = line_ab / line_ab(3);
 
-line_be = [[B(1) B(2)]; [E(1) E(2)]];
-plot(line_be(:,1),line_be(:,2),'LineWidth',4,'Color', 'r');
-%text(line_be(:,1),line_be(:,2), 'be', 'FontSize', 20, 'Color', 'r');
-line_be = cross(B, E);
-line_be = line_be / line_be(3);
+seg_bc = [[B(1) B(2)]; [C(1) C(2)]];
+plot(seg_bc(:,1),seg_bc(:,2),'LineWidth',4,'Color', 'r');
+line_bc = cross(B, C);
+line_bc = line_bc / line_bc(3);
 
-line_ge = [[G(1) G(2)]; [E(1) E(2)]];
-plot(line_ge(:,1),line_ge(:,2),'LineWidth',4,'Color', 'r');
-%text(line_ge(:,1),line_ge(:,2), 'ge', 'FontSize', 20, 'Color', 'r');
-line_ge = cross(G, E);
-line_ge = line_ge / line_ge(3);
-
-line_an = [[A(1) A(2)]; [N(1) N(2)]];
-plot(line_an(:,1),line_an(:,2),'LineWidth',4,'Color', 'r');
-%text(line_an(:,1),line_an(:,2), 'an', 'FontSize', 20, 'Color', 'r');
-line_an = cross(A, N);
-line_an = line_an / line_an(3);
-
-line_bl = [[B(1) B(2)]; [L(1) L(2)]];
-plot(line_bl(:,1),line_bl(:,2),'LineWidth',4,'Color', 'r');
-%text(line_bl(:,1),line_bl(:,2), 'bl', 'FontSize', 20, 'Color', 'r');
-line_bl = cross(B, L);
-line_bl = line_bl / line_bl(3);
+facade_3 = sqrt((B(1)-E(1))^2 + (B(2)-E(2))^2);
+shadow = sqrt((B(1)-C(1))^2 + (B(2)-C(2))^2);
 
 hold off;
 pause;
 
-%% RECTIFICATION
+%% STRATIFIED RECTIFICATION
 constr = zeros(2,3);
-constr(1,:) = [line_an(1)*line_bl(1),line_an(1)*line_bl(2)+line_an(2)*line_bl(1), line_an(2)*line_bl(2)];
-constr(2,:) = [line_be(1)*line_ge(1),line_be(1)*line_ge(2)+line_be(2)*line_ge(1), line_be(2)*line_ge(2)];
+
+line_bc = cross(B,C); % shadow
+line_bc = line_bc / line_bc(3); % shadow
+line_ab = cross(A,B); % outgoing wall
+line_ab = line_ab / line_ab(3); % outgoing wall
+constr(1,:) = [line_ab(1) * line_bc(1), line_ab(1) * line_bc(2) + line_ab(2) * line_bc(1), line_ab(2) * line_bc(2)];
+
+k = (1 / 3.9) ^ 2; % ratio
+seg_bc = C - B; % shadow
+seg_ab = B - A; % outgoing wall
+constr(2,:) = [seg_bc(1) ^ 2 - k * seg_ab(1) ^ 2, seg_bc(1) * seg_bc(2) - k * seg_ab(1) * seg_ab(2), seg_bc(2) ^ 2 - k * seg_ab(2) ^ 2];
 
 % solve the system
 [~,~,v] = svd(constr);
@@ -307,40 +254,43 @@ D(2) = D(2) + 376;
 E(2) = E(2) + 376;
 G(2) = G(2) + 376;
 
+facade_3 = sqrt((B(1)-E(1))^2 + (B(2)-E(2))^2);
+shadow = sqrt((B(1)-C(1))^2 + (B(2)-C(2))^2);
+
 figure; imshow(J), hold on;
 
 % points
-%plot(A(1), A(2),'.b','MarkerSize',12);
-%text(A(1), A(2), 'A', 'FontSize', 24, 'Color', 'b');
-%plot(B(1), B(2),'.b','MarkerSize',12);
-%text(B(1), B(2), 'B', 'FontSize', 24, 'Color', 'b');
-%plot(C(1), C(2),'.b','MarkerSize',12);
-%text(C(1), C(2), 'C', 'FontSize', 24, 'Color', 'b');
-%plot(D(1), D(2),'.b','MarkerSize',12);
-%text(D(1), D(2), 'D', 'FontSize', 24, 'Color', 'b');
-%plot(E(1), E(2),'.b','MarkerSize',12);
-%text(E(1), E(2), 'E', 'FontSize', 24, 'Color', 'b');
-%plot(G(1), G(2),'.b','MarkerSize',12);
-%text(G(1), G(2), 'G', 'FontSize', 24, 'Color', 'b');
+if debug
+    plot(A(1), A(2),'.b','MarkerSize',12);
+    text(A(1), A(2), 'A', 'FontSize', 24, 'Color', 'b');
+    plot(B(1), B(2),'.b','MarkerSize',12);
+    text(B(1), B(2), 'B', 'FontSize', 24, 'Color', 'b');
+    plot(C(1), C(2),'.b','MarkerSize',12);
+    text(C(1), C(2), 'C', 'FontSize', 24, 'Color', 'b');
+    plot(D(1), D(2),'.b','MarkerSize',12);
+    text(D(1), D(2), 'D', 'FontSize', 24, 'Color', 'b');
+    plot(E(1), E(2),'.b','MarkerSize',12);
+    text(E(1), E(2), 'E', 'FontSize', 24, 'Color', 'b');
+    plot(G(1), G(2),'.b','MarkerSize',12);
+    text(G(1), G(2), 'G', 'FontSize', 24, 'Color', 'b');
+end
 
-% LINES
+% lines
 facade_2 = [[A(1) A(2)]; [B(1) B(2)]];
 plot(facade_2(:,1),facade_2(:,2),'LineWidth',6,'Color', 'g');
-%text(facade_2(:,1),facade_2(:,2), '2', 'FontSize', 20, 'Color', 'red');
 
 facade_3 = [[B(1) B(2)]; [E(1) E(2)]];
 plot(facade_3(:,1),facade_3(:,2),'LineWidth',6,'Color', 'g');
-%text(facade_3(:,1),facade_3(:,2), '3', 'FontSize', 20, 'Color', 'red');
 
 facade_4 = [[E(1) E(2)]; [G(1) G(2)]];
 plot(facade_4(:,1),facade_4(:,2),'LineWidth',6,'Color', 'g');
-%text(facade_4(:,1),facade_4(:,2), '4', 'FontSize', 20, 'Color', 'red');
 hold off;
  
 %normalized coordinates
 norm_factor = max((size(img)));
 norm_matrix = diag([1/norm_factor, 1/norm_factor, 1]);
 
+% ratio elements
 D_n = (D' * norm_matrix)';
 E_n = (E' * norm_matrix)';
 G_n = (G' * norm_matrix)';

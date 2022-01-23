@@ -9,6 +9,7 @@ clear;
 close all;
 img = imread('../../img/villa_image.png');
 img_gray = rgb2gray(img);
+debug = false;
 
 % lines detection
 lines = findLines(img_gray);
@@ -21,7 +22,6 @@ imshow(img), hold on;
 for k = 1:length(idx)
     xy = [lines(idx(k)).point1; lines(idx(k)).point2];
     plot(xy(:,1),xy(:,2),'LineWidth',4,'Color', 'g');
-    %text(xy(:,1),xy(:,2), label(k), 'FontSize', 20, 'Color', 'g'); 
 end
 
 % vertical vanishing point
@@ -39,14 +39,16 @@ E = [731 551 1]';
 G = [821 364 1]';
 
 % plotting those points selected
-%plot(A(1), A(2),'.b','MarkerSize',12);
-%text(A(1), A(2), 'A', 'FontSize', 24, 'Color', 'b');
-%plot(B(1), B(2),'.b','MarkerSize',12);
-%text(B(1), B(2), 'B', 'FontSize', 24, 'Color', 'b');
-%plot(E(1), E(2),'.b','MarkerSize',12);
-%text(E(1), E(2), 'E', 'FontSize', 24, 'Color', 'b');
-%plot(G(1), G(2),'.b','MarkerSize',12);
-%text(G(1), G(2), 'G', 'FontSize', 24, 'Color', 'b');
+if debug
+    plot(A(1), A(2),'.b','MarkerSize',12);
+    text(A(1), A(2), 'A', 'FontSize', 24, 'Color', 'b');
+    plot(B(1), B(2),'.b','MarkerSize',12);
+    text(B(1), B(2), 'B', 'FontSize', 24, 'Color', 'b');
+    plot(E(1), E(2),'.b','MarkerSize',12);
+    text(E(1), E(2), 'E', 'FontSize', 24, 'Color', 'b');
+    plot(G(1), G(2),'.b','MarkerSize',12);
+    text(G(1), G(2), 'G', 'FontSize', 24, 'Color', 'b');
+end
 
 % plotting linking lines with selected points
 line_ab = cross(A,B);
@@ -89,9 +91,9 @@ H_aff = [1.0000, 0,      -0.0001;
          0,      0,       1.0000;];
 
 % euclidean transformation matrix
-H_met = [1.1376,   -0.3067,   0;
-        -0.3067,    1.7169,   0;
-         0,         0,        1.0000;];
+H_met = [1.2712,   -0.3197,    0;
+        -0.3197,    1.4014,    0;
+         0,         0,         1.0000;];
 
 % overall homography to be used for circular points contraints
 H = H_met * H_aff;

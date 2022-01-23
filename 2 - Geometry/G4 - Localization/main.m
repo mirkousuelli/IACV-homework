@@ -10,14 +10,14 @@ CC = [731 551];  % C
 DD = [799 1255]; % D
 
 % vertical rectifying homography from point G3
-Hrec = [-0.9986,    0.1357,   -0.0001;
-        -0.0521,   -2.6004,    0.0005;
-        -0.0001,    0.0013,    1.0000;];
+Hrec = [-0.9999,   -0.0115,   -0.0001;
+         0.0217,   -1.8776,    0.0009;
+        -0.0001,    0.0005,    1.0000;];
 
 % calibration matrix from point G2
-K = 1.0e+03 * [1.3158, 0,      0.5481;
-               0,      0.8163, 0.9504;
-               0,      0,      0.0010;]; 
+K = 1.0e+03 * [1.1455,  0,          0.5217;
+               0,       0.9713,     0.8365;
+               0,       0,          0.0010;];
 
 % rectifying image points
 tform = projective2d(Hrec.');
@@ -27,11 +27,11 @@ tform = projective2d(Hrec.');
 [DD(1),DD(2)] = transformPointsForward(tform,DD(1),DD(2));
 
 % facade 3 side ratios
-vert_ratio = 0.4234;
-horiz_ratio = 0.7976;
+horiz_ratio = 0.5703;
+vert_ratio = 0.8569;
 
 % facade 3 temporary dimensions
-LONG_REAL = 934.2631;
+LONG_REAL = 500;
 SHORT_REAL = LONG_REAL * vert_ratio;
 DEPTH_REAL = SHORT_REAL * horiz_ratio;
 
@@ -124,7 +124,7 @@ showShape('cuboid',facade_5_pos, 'Color', light_blue,'Opacity',0.5);
 title('camera localized with respect to facade 3 on the XY plane');
 xlim([-1000 2000]);
 ylim([0 2000]);
-zlim([0 2000]);
+zlim([0 3000]);
 
 % camera position and rotation in the world reference frame
 plotCamera('location', cameraPosition, 'orientation', cameraRotation.', 'size', 50);

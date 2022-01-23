@@ -11,9 +11,9 @@ img = imread('../../img/villa_image.png');
 img_gray = rgb2gray(img);
 
 % calibration matrix from point G2
-K = 1.0e+03 * [1.3158, 0,      0.5481;
-               0,      0.8163, 0.9504;
-               0,      0,      0.0010;]; 
+K = 1.0e+03 * [1.1455,  0,          0.5217;
+               0,       0.9713,     0.8365;
+               0,       0,          0.0010;];
 
 % image points from corner detection
 AA = [203 1268 1]; % A
@@ -43,6 +43,7 @@ text(CC(1), CC(2), 'C', 'FontSize', 24, 'Color', 'r');
 plot(DD(1), DD(2),'.r','MarkerSize',12);
 text(DD(1), DD(2), 'D', 'FontSize', 24, 'Color', 'r');
 hold off;
+pause;
 
 % first vanishing point
 line_ab = cross(AA, BB);
@@ -118,10 +119,10 @@ AA = - AA(1:2);
 BB = - BB(1:2);
 CC = - CC(1:2);
 DD = - DD(1:2);
-AA(2) = AA(2) + 171;
-BB(2) = BB(2) + 171;
-CC(2) = CC(2) + 171;
-DD(2) = DD(2) + 171;
+AA(2) = AA(2) + 25;
+BB(2) = BB(2) + 25;
+CC(2) = CC(2) + 25;
+DD(2) = DD(2) + 25;
 
 % plotting the final outcome
 fig = figure();
