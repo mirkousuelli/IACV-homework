@@ -199,16 +199,15 @@ constr(1,:) = [line_ab(1) * line_bc(1), line_ab(1) * line_bc(2) + line_ab(2) * l
 k = (1 / 3.9) ^ 2; % ratio
 seg_bc = C - B; % shadow
 seg_ab = B - A; % outgoing wall
-constr(2,:) = [seg_bc(1) ^ 2 - k * seg_ab(1) ^ 2, seg_bc(1) * seg_bc(2) - k * seg_ab(1) * seg_ab(2), seg_bc(2) ^ 2 - k * seg_ab(2) ^ 2];
+constr(2,:) = [seg_bc(1) ^ 2 - k * seg_ab(1) ^ 2, 2 * (seg_bc(1) * seg_bc(2) - k * seg_ab(1) * seg_ab(2)), seg_bc(2) ^ 2 - k * seg_ab(2) ^ 2];
 
 % solve the system
 [~,~,v] = svd(constr);
 s = v(:,end); %[s11,s12,s22];
-S = [s(1),s(2); s(2),s(3)];
+S = [s(1), s(2); s(2),s(3)];
 
 % compute the rectifying homography
 % image of circular points
-imDCCP = [S,zeros(2,1); zeros(1,3)]; % the image of the circular points
 [U,DD,V] = svd(S);
 constr = U*sqrt(DD)*V';
 
@@ -219,7 +218,6 @@ H(2,1) = constr(2,1);
 H(2,2) = constr(2,2);
 
 Hrect = inv(H);
-Cinfty = [eye(2),zeros(2,1);zeros(1,3)];
 
 tform = projective2d(Hrect');
 J = imwarp(J,tform);

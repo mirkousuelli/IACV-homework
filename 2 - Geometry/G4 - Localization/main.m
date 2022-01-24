@@ -10,13 +10,20 @@ CC = [731 551];  % C
 DD = [799 1255]; % D
 
 % vertical rectifying homography from point G3
-Hrec = [-0.9999,   -0.0115,   -0.0001;
-         0.0217,   -1.8776,    0.0009;
-        -0.0001,    0.0005,    1.0000;];
+
+H_met = [1.2398,   -0.3136,    0;
+        -0.3136,    1.4399,    0;
+         0,         0,         1.0000;];
+     
+H_aff = [1.0000,    0,         -0.0001;
+         0,         1.0000,    -0.0008;
+         0,         0,          1.0000;];
+
+Hrec = H_met * H_aff;
 
 % calibration matrix from point G2
-K = 1.0e+03 * [1.1455,  0,          0.5217;
-               0,       0.9713,     0.8365;
+K = 1.0e+03 * [1.1693,  0,          0.5250;
+               0,       0.9424,     0.8602;
                0,       0,          0.0010;];
 
 % rectifying image points
@@ -27,8 +34,8 @@ tform = projective2d(Hrec.');
 [DD(1),DD(2)] = transformPointsForward(tform,DD(1),DD(2));
 
 % facade 3 side ratios
-horiz_ratio = 0.5703;
-vert_ratio = 0.8569;
+horiz_ratio = 0.6034;
+vert_ratio = 0.5596;
 
 % facade 3 temporary dimensions
 LONG_REAL = 500;

@@ -11,8 +11,8 @@ img = imread('../../img/villa_image.png');
 img_gray = rgb2gray(img);
 
 % calibration matrix from point G2
-K = 1.0e+03 * [1.1455,  0,          0.5217;
-               0,       0.9713,     0.8365;
+K = 1.0e+03 * [1.1693,  0,          0.5250;
+               0,       0.9424,     0.8602;
                0,       0,          0.0010;];
 
 % image points from corner detection
@@ -150,6 +150,6 @@ text(DD(1), DD(2), 'D', 'FontSize', 24, 'Color', 'r');
 hold off;
 
 % ratios useful for point G4
-short = sqrt((AA(1) - BB(1))^2 + (AA(2) - BB(2))^2)
-long = sqrt((AA(1) - CC(1))^2 + (AA(2) - CC(2))^2)
+long = sqrt((AA(1) - BB(1))^2 + (AA(2) - BB(2))^2)
+short = sqrt((AA(1) - DD(1))^2 + (AA(2) - DD(2))^2)
 ratio = short / long

@@ -91,8 +91,8 @@ H_aff = [1.0000, 0,      -0.0001;
          0,      0,       1.0000;];
 
 % euclidean transformation matrix
-H_met = [1.2712,   -0.3197,    0;
-        -0.3197,    1.4014,    0;
+H_met = [1.2398,   -0.3136,    0;
+        -0.3136,    1.4399,    0;
          0,         0,         1.0000;];
 
 % overall homography to be used for circular points contraints
