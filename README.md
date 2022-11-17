@@ -1,5 +1,5 @@
-# Image Analisys and Computer Vision
-Image Analisys and Computer Vision course 2021/2022 - Politecnico di Milano.
+# Image Analysis and Computer Vision
+Image Analysis and Computer Vision course 2021/2022 - Politecnico di Milano.
 
 Hello dears! Welcome to the hell :smiling_imp: :fire: :japanese_goblin:
 
